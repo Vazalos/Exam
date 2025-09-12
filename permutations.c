@@ -1,131 +1,75 @@
 #include <stdio.h>
-#include <stdlib.h>
 
-void	swap(char *str, int l_index, int r_index)
+void swap(char *a, char *b)
 {
-	char temp = str[l_index];
-	str[l_index] = str[r_index];
-	str[r_index] = temp;
+    char temp;
+    temp = *a;
+    *a = *b;
+    *b = temp;
 }
 
-void print_list(char **list, int max)
+char *sort_str(char *str, int len)
 {
-	int i = 0;
+    int i = 0;
+    int j;
 
-	while (i < max)
-	{
-		printf("%s\n", list[i]);
-		i++;
-	}
+    while (i < len)
+    {
+        j = i + 1;
+        while (j < len)
+        {
+            if (str[i] > str[j])
+                swap(&str[i], &str[j]);
+            j++;
+        }
+        i++;
+    }
+    return(str);
 }
 
-char* ft_strdup(char *str)
+int next_permutation(char *str, int len)
 {
-	int i = 0;
-	char *new_str;
-	int len;
+    int i;
+    int j;
+    int start;
+    int end;
 
-	while(str[i])
-		i++;
-	len = i;
-	new_str = malloc((len + 1) * sizeof(char));
-	if(!new_str)
-		return(NULL);
-	i = 0;
-	while(i < len)
-	{
-		new_str[i] = str[i];
-		i++;
-	}
-	new_str[i] = '\0';
-	return(new_str);
-}
-
-void permutations(char *str, int len, int l_index, int r_index, int max, char **list)
-{
-	static int i;
-
-	if (l_index == len)
-	{
-		list[i++] = ft_strdup(str);
-		if (i == max)
-			print_list(list, max);
-		return ;
-	}
-	r_index = l_index;
-	while (r_index < len)
-	{
-		swap(str, l_index, r_index);
-		permutations(str, len, l_index + 1, r_index, max, list);
-		swap(str, l_index, r_index);
-		r_index++;
-	}
-}
-
-int diff(char* str1, char *str2, int len)
-{
-	int i = 0;
-
-	while (i < len && str1[i] == str2[i])
-		i++;
-	if(i == len)
-		return(0);
-	if(str1[i] > str2[i])
-		return(1);
-	else if (str1[i] < str2[i])
-		return(-1);
-	else
-		return(-2);
-}
-
-char *organize(char *str)
-{
-	int i = 0;
-	int j = 0;
-
-	while(str[i])
-	{
-		while(str[j])
-		{
-			if (str[i] > str[j])
-				swap(str, i, j);
-			j++;
-		}
-		i++;
-		j = i + 1;
-	}
-	return (str);
+    i = len - 2;
+    while (i >= 0 && str[i] >= str[i + 1])
+        i--;
+    if (i < 0)
+        return(0);
+    j = len - 1;
+    while (str[j] < str[i])
+        j--;
+    swap(&str[i], &str[j]);
+    start = i + 1;
+    end = len - 1;
+    while (start < end)
+    {
+        swap(&str[start], &str[end]);
+        start++;
+        end--;
+    }
+    return(1);
 }
 
 int main(int argc, char **argv)
 {
-	char *str;
-	int i = 0;
-	int len;
-	int max = 1;
-	char **list;
-
-	if (argc != 2)
-		return(1);
-	str = argv[1];
-	while(str[i])
-		i++;
-	len = i;
-	while (i > 1)
-	{
-		max = max * i;
-		i--;
-	}
-	list = malloc((max + 1) * sizeof(char));
-	if (!list)
-		return(1);
-	str = organize(str);
-	permutations(str, len, 0, 0, max, list);
-	i = 0;
-	while(i < max)
-	{
-		free(list[i]);
-		i++;
-	} 
-	free(list);
+    if (argc != 2) 
+    {
+        return(1);
+    }
+    char *str = argv[1];
+    int len = 0;
+    if (!str)
+        return(1);
+    while (str[len])
+    {
+        len++;
+    }
+    str = sort_str(str, len);
+    puts(str);
+    while (next_permutation(str, len) != 0)
+        puts(str);
 }

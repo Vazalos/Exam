@@ -4,14 +4,13 @@
 
 int match_space(FILE *f)
 {
-    int cha;
+    int cha = fgetc(f);
 
-    cha = fgetc(f);
-    if(cha == EOF)
-        return(EOF);
+    if (cha == EOF)
+        return(-1);
     while(cha != EOF)
     {
-        if(isspace(cha) == 0)
+        if (isspace(cha) == 0)
         {
             break;
         }
@@ -24,9 +23,8 @@ int match_space(FILE *f)
 
 int match_char(FILE *f, char c)
 {
-    int cha;
+    int cha = fgetc(f);
 
-    cha = fgetc(f);
     if (cha == c)
         return(1);
     if (cha != EOF)
@@ -36,12 +34,11 @@ int match_char(FILE *f, char c)
 
 int scan_char(FILE *f, va_list ap)
 {
-    int cha;
+    int cha = fgetc(f);
     char *dest;
 
-    cha = fgetc(f);
     if (cha == EOF)
-        return(0);
+        return(-1);
     dest = va_arg(ap, char*);
     *dest = (char)cha;
     return (1);
@@ -49,29 +46,35 @@ int scan_char(FILE *f, va_list ap)
 
 int scan_int(FILE *f, va_list ap)
 {
+    int cha;
+    int *dest;
     int value = 0;
     int sign = 1;
     int digits = 0;
-    int cha;
-    int* dest;
 
     cha = fgetc(f);
-    if (cha != '+' && cha != '-' && isdigit(cha) == 0)
-        return(0);
-    if (cha == '+' || cha == '-')
+    if(cha != '-' && cha != '+' && isdigit(cha) == 0)
     {
-        if (cha == '-')
-            sign = -1;
-        cha = fgetc(f); 
+        printf("wrong first char (num) || tests %c, %i, %i, %i\n", (char)cha, cha != '-', cha != '+', isdigit(cha) == 0);
+        return(-1);
     }
-    while (cha != EOF && isdigit(cha) != 0)
+    if(cha == '-' || cha == '+')
+    {
+        if(cha == '-')
+            sign = -1;
+        cha = fgetc(f);
+    }
+    while(cha != EOF && isdigit(cha) != 0)
     {
         value = value * 10 + (cha - '0');
         cha = fgetc(f);
         digits++;
     }
     if (digits == 0)
-        return(0);
+    {
+        printf("no digits counted (num)\n");
+        return(-1);
+    }
     dest = va_arg(ap, int*);
     *dest = (value * sign);
     if (cha != EOF)
@@ -81,13 +84,12 @@ int scan_int(FILE *f, va_list ap)
 
 int scan_string(FILE *f, va_list ap)
 {
-    int cha;
+    int cha = fgetc(f);
     char *dest = va_arg(ap, char*);
     int i = 0;
 
-    cha = fgetc(f);
-    if (cha == EOF)
-        return(0);
+    if(cha == EOF)
+        return(-1);
     while (cha != EOF && isspace(cha) == 0)
     {
         dest[i++] = (char)cha;
@@ -162,27 +164,46 @@ int ft_scanf(const char *format, ...)
 	va_end(ap);
 	return ret;
 }
-
-int main()
+/*
+int main(void)
 {
-    int num;
     char c;
-    char str[1000];
+    int num;
+    char str[100];
 
-    printf("input word: ");
-    if (ft_scanf("%s", &str) != 1)
-        printf("invalid word");
+    printf("insert a number\n");
+    ft_scanf("%d", &num);
+    printf("insert a char\n");
+    ft_scanf("%c", &c);
 
-    printf("input number: ");
-    if (ft_scanf("%d", &num) != 1)
-        printf("invalid num");
+    printf("insert a word\n");
+    ft_scanf("%s", str);
 
-    printf("input character: ");
-    if (ft_scanf("%c", &c) != 1)
-        printf("invalid char");
+    
+    printf("insert thusly 'number, char, word'\n");
+    ft_scanf("%d, %c, %s", &c, &num, str);
+    
+    printf("you wrote char '%c', number '%d', and word '%s'\n", c, num, str);
+    return(0);
+}*/
 
-    printf("\n");
-    printf("num is %d\n", num);
-    printf("char is %c\n", c);
-    printf("word is %s\n", str);
+int main(void)
+{
+	char c;
+	int n;
+	char str[100];
+
+    /*
+	printf("enter a char, digit, string\n");
+	if (ft_scanf("%c", &c) < 1)
+		printf("error\n");
+	if (ft_scanf("%s", str) < 1)
+		printf("error\n");
+	if (ft_scanf("%d", &n) < 1)
+		printf("error\n");*/
+
+    ft_scanf("%c %s %d", &c, str, &n);
+
+	printf("you entered\n c = '%c'\n d = '%d'\n s = '%s'", c, n, str);
+	return (0);
 }

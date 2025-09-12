@@ -1,61 +1,54 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void print_solution(int *board, int n)
+void print_list(int *queen_pos, int n)
 {
     int i = 0;
 
-    while(i < n)
+    while (i < n)
     {
         if (i > 0)
             fprintf(stdout, " ");
-        fprintf(stdout, "%i", board[i]);
+        fprintf(stdout, "%i", queen_pos[i]);
         i++;
     }
     fprintf(stdout, "\n");
 }
 
-int absol(int num)
+int is_safe(int *queen_pos, int col, int row)
 {
-    if (num < 0)
-        return(-num);
-    return(num);
-}
+    int old_col = 0;
+    int old_row;
 
-int is_safe(int *board, int col, int row)
-{
-    int prev_col = 0;
-    int prev_row;
-
-    while (prev_col < col)
+    while (old_col < col)
     {
-        prev_row = board[prev_col];
-        if (prev_row == row ||
-            prev_row + prev_col == row + col ||
-            prev_row - prev_col == row - col)
+        old_row = queen_pos[old_col];
+        if(row == old_row 
+            || old_row - old_col == row - col
+            || old_row + old_col == row + col)
         {
             return(0);
         }
-        prev_col++;
+        old_col++;
     }
     return(1);
 }
 
-void n_queens(int *board, int n, int col)
+void n_queens(int *queen_pos, int n, int col)
 {
     int row = 0;
 
-    if (col == n)
+    if(col == n)
     {
-        print_solution(board, n);
+        print_list(queen_pos, n);
         return ;
     }
     while (row < n)
     {
-        if (is_safe(board, col, row) == 1)
+        if (is_safe(queen_pos, col, row) == 1)
         {
-            board[col] = row;
-            n_queens(board, n, col + 1);
+            queen_pos[col] = row;
+            n_queens(queen_pos, n, col + 1);
         }
         row++;
     }
@@ -63,14 +56,16 @@ void n_queens(int *board, int n, int col)
 
 int main(int argc, char **argv)
 {
+    int n;
+    int *queen_pos;
     if (argc != 2)
         return(1);
-    int n = atoi(argv[1]);
+    n = atoi(argv[1]);
     if (n <= 0)
-        return(0);
-    int *board = malloc(n * sizeof(int));
-    if (!board)
         return(1);
-    n_queens(board, n, 0);
-    free(board);
+    queen_pos = malloc(n * sizeof(int));
+    if (!queen_pos)
+        return(1);
+    n_queens(queen_pos, n, 0);
+    free(queen_pos);
 }
